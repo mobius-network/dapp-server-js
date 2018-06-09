@@ -34,7 +34,24 @@ apiApp.get("/balance", async (req, res, next) => {
     res.json({balance: dapp.userBalance});
   } catch (e) {
     console.log(e);
-    next(e);
+    res.status(500).send("Internal server error")
+  }
+});
+
+apiApp.get("/charge", async (req, res, next) => {
+  try {
+    const { APP_KEY } = req.webtaskContext.secrets;
+    const dapp = await Mobius.AppBuilder.build(APP_KEY, req.user.sub);
+
+    const response = await dapp.pay(req.query.amount, req.query.target_address)
+    res.json({
+      status: "ok",
+      tx_hash: response.hash,
+      user_balance: dapp.userBalance
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send("Internal server error")
   }
 });
 
