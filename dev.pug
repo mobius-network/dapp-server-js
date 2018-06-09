@@ -51,12 +51,12 @@ body
     $(function () {
       var xdr = null;
       var signedXDR = null;
-      var keypair = StellarSdk.Keypair.random();
+      var random_keypair = StellarSdk.Keypair.random();
       var appPublicKey = $("#appPublicKey").val();
 
       StellarSdk.Network.useTestNetwork();
-      $("#public_key").val(keypair.publicKey());
-      $("#secret").val(keypair.secret());
+      $("#public_key").val(random_keypair.publicKey());
+      $("#secret").val(random_keypair.secret());
 
       function verify(tx, keypair) {
         const { signatures } = tx;
@@ -65,6 +65,7 @@ body
         if (!signatures || signatures.length === 0) {
           return false;
         }
+
 
         return signatures.some(function(signature) { return keypair.verify(hash, signature.signature()) });
       }
@@ -80,6 +81,7 @@ body
       });
 
       $("#sign").on("click", function() {
+        let keypair = StellarSdk.Keypair.fromSecret($("#secret").val())
         let tx = new StellarSdk.Transaction(xdr);
         let developerKeypair = StellarSdk.Keypair.fromPublicKey(appPublicKey);
 

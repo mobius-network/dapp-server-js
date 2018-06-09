@@ -2,7 +2,7 @@ const express = require('express');
 const expressJwt = require('express-jwt');
 
 // const StellarSdk = require("stellar-sdk");
-// const Mobius = require("@mobius-network/mobius-client-js");
+const Mobius = require("@mobius-network/mobius-client-js");
 
 const apiApp = express();
 module.exports = apiApp;
@@ -23,7 +23,19 @@ apiApp.use((req, res, next) => {
 
 apiApp.get("/test", (req, res) => {
   console.log("User: ", req.user.sub);
-  res.json({ user: req.user })
+  res.json({ user: req.user });
+});
+
+apiApp.get("/balance", async (req, res, next) => {
+  try {
+    const { APP_KEY } = req.webtaskContext.secrets;
+    const dapp = await Mobius.AppBuilder.build(APP_KEY, req.user.sub);
+
+    res.json({balance: dapp.userBalance});
+  } catch (e) {
+    console.log(e);
+    next(e);
+  }
 });
 
 function getToken(req) {
