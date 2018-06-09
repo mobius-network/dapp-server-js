@@ -33,8 +33,7 @@ apiApp.get("/balance", async (req, res, next) => {
 
     res.json({balance: dapp.userBalance});
   } catch (e) {
-    console.log(e);
-    res.status(500).send("Internal server error")
+    next(e);
   }
 });
 
@@ -58,10 +57,12 @@ apiApp.get("/charge", async (req, res, next) => {
       balance: dapp.userBalance
     });
   } catch (e) {
-    console.log(e);
-    res.status(500).send("Internal server error")
+    next(e);
   }
 });
+
+apiApp.use(logErrors);
+apiApp.use(errorHandler);
 
 function getToken(req) {
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
@@ -70,4 +71,14 @@ function getToken(req) {
     return req.query.token;
   }
   return null;
+}
+
+function logErrors(err, req, res, next) {
+  console.error(err);
+  next(err);
+}
+
+function errorHandler(err, req, res, next) {
+  res.status(500);
+  res.json({ error: "Internal server error" });
 }
