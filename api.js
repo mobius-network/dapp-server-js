@@ -43,11 +43,19 @@ apiApp.get("/charge", async (req, res, next) => {
     const { APP_KEY } = req.webtaskContext.secrets;
     const dapp = await Mobius.AppBuilder.build(APP_KEY, req.user.sub);
 
+    const amount = req.query.amount
+
+    if (amount === null || isNaN(amount)) {
+      return res.status(400).json({
+        error: "Invalid amount"
+      })
+    }
+
     const response = await dapp.pay(req.query.amount, req.query.target_address)
     res.json({
       status: "ok",
       tx_hash: response.hash,
-      user_balance: dapp.userBalance
+      balance: dapp.userBalance
     });
   } catch (e) {
     console.log(e);
