@@ -7,9 +7,6 @@ const Mobius = require("@mobius-network/mobius-client-js");
 const apiApp = express();
 module.exports = apiApp;
 
-apiApp.use(express.json());
-apiApp.use(express.urlencoded({ extended: true }));
-
 apiApp.use((req, res, next) => {
   const { APP_KEY } = req.webtaskContext.secrets;
   const { APP_DOMAIN } = req.webtaskContext.meta;
