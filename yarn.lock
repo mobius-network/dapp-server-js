@@ -515,9 +515,9 @@
     lodash "^4.17.5"
     to-fast-properties "^2.0.0"
 
-"@mobius-network/mobius-client-js@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@mobius-network/mobius-client-js/-/mobius-client-js-0.3.2.tgz#501ffee2caf5955bcba8a1c7414f3d5d3be0f048"
+"@mobius-network/mobius-client-js@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@mobius-network/mobius-client-js/-/mobius-client-js-0.4.0.tgz#f104580edfdcf54fcf315171519b84d54b421f33"
   dependencies:
     babel-runtime "^6.26.0"
     stellar-sdk "^0.8.0"
