@@ -1,8 +1,14 @@
 # Mobius DApp Server
 
+This repo provides a default implementation of Mobius DApp backend running on [Webtask.io](https://webtask.io).
+It exposes some generic API calls, like `/balance` and `/charge`. If your DApp frontend requires something
+different, you can fork this repo and extend the API up to your needs.
+
 ## Install.
 
 ```console
+$ git clone https://github.com/mobius-network/dapp-server-js.git
+$ cd dapp-server-js
 $ yarn install
 ```
 
@@ -12,12 +18,19 @@ $ yarn install
 # Register an account on webtask.io:
 $ yarn wt profile init
 
-# Fill in DApp secret key and domain:
-$ cp .env.sample .env
+# Setup a new DApp for development:
+$ yarn setup
 ``` 
 
 ## Run.
 
 ```console
-$ yarn start
-``` 
+# Run locally
+$ yarn dev
+
+# Deploy to Webtask.io
+$ yarn deploy
+
+# Deploy to Webtask.io and re-deploy on changes
+$ yarn watch
+```

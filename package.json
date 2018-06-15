@@ -1,5 +1,5 @@
 {
-  "name": "mobius-server",
+  "name": "@mobius-network/dapp-server",
   "version": "0.0.1",
   "description": "Example DApp server running on webtask.io",
   "main": "index.js",
@@ -7,7 +7,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "wt create --secrets-file .secrets --meta-file .env --bundle --watch ."
+    "setup": "node setup.js",
+    "dev": "wt serve --secrets-file .env --meta-file .env .",
+    "deploy": "wt create --name dapp-server --secrets-file .secrets --meta-file .env --bundle .",
+    "watch": "wt create --name dapp-server --secrets-file .secrets --meta-file .env --bundle --watch ."
   },
   "dependencies": {
     "@mobius-network/mobius-client-js": "^0.4.0",

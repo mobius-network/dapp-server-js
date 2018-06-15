@@ -1,7 +1,6 @@
 const express = require('express');
 const expressJwt = require('express-jwt');
 
-// const StellarSdk = require("stellar-sdk");
 const Mobius = require("@mobius-network/mobius-client-js");
 
 const apiApp = express();
