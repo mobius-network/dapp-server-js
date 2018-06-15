@@ -21,8 +21,8 @@ authApp.post("/", (req, res) => {
   try {
     const token = new Mobius.Auth.Token(
       APP_KEY,
-      req.query.xdr,
-      req.query.public_key
+      req.body.xdr || req.query.xdr,
+      req.body.public_key || req.query.public_key
     );
     token.validate();
 
