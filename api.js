@@ -11,7 +11,8 @@ apiApp.use(express.json());
 apiApp.use(express.urlencoded({ extended: true }));
 
 apiApp.use((req, res, next) => {
-  const { APP_KEY, APP_DOMAIN } = req.webtaskContext.secrets;
+  const { APP_KEY } = req.webtaskContext.secrets;
+  const { APP_DOMAIN } = req.webtaskContext.meta;
 
   expressJwt({
     secret: APP_KEY,

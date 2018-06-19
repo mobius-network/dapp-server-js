@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "wt create --secrets-file .env --bundle --watch ."
+    "start": "wt create --secrets-file .secrets --meta-file .env --bundle --watch ."
   },
   "dependencies": {
     "@mobius-network/mobius-client-js": "^0.3.2",

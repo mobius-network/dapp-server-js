@@ -15,7 +15,8 @@ authApp.get("/", (req, res) => {
 });
 
 authApp.post("/", (req, res) => {
-  const { APP_KEY, APP_DOMAIN } = req.webtaskContext.secrets;
+  const { APP_KEY } = req.webtaskContext.secrets;
+  const { APP_DOMAIN } = req.webtaskContext.meta;
 
   try {
     const token = new Mobius.Auth.Token(
