@@ -1,22 +1,25 @@
 # Mobius DApp Server
 
-## Install.
+## Install
 
 ```console
 $ yarn install
 ```
 
-## Configure.
+## Configure
 
 ```console
 # Register an account on webtask.io:
 $ yarn wt profile init
 
-# Fill in DApp secret key and domain:
+# Fill in DApp secret key:
+$ cp .secrets.sample .secrets
+
+# Fill in Stellar network setting and server domain:
 $ cp .env.sample .env
 ``` 
 
-## Run.
+## Run
 
 ```console
 $ yarn start
