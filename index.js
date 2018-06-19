@@ -22,6 +22,18 @@ app.use((req, res, next) => {
     network === 'public' ? StellarSdk.Networks.PUBLIC : StellarSdk.Networks.TESTNET;
   next();
 });
+
+app.use((req, res, next) => {
+  const { APP_DOMAIN } = req.webtaskContext.meta;
+
+  let allowedDomain =
+    req.webtaskContext.meta.NETWORK === 'public' ? APP_DOMAIN : '*';
+
+  res.header("Access-Control-Allow-Origin", allowedDomain);
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use("/api", require("./api"));
 app.use("/auth", require("./auth"));
 
