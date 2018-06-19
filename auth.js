@@ -6,9 +6,6 @@ const Mobius = require("@mobius-network/mobius-client-js");
 const authApp = express();
 module.exports = authApp;
 
-authApp.use(express.json());
-authApp.use(express.urlencoded({ extended: true }));
-
 authApp.get("/", (req, res) => {
   const { APP_KEY } = req.webtaskContext.secrets;
   res.send(Mobius.Auth.Challenge.call(APP_KEY));
@@ -21,8 +18,8 @@ authApp.post("/", (req, res) => {
   try {
     const token = new Mobius.Auth.Token(
       APP_KEY,
-      req.query.xdr,
-      req.query.public_key
+      req.body.xdr || req.query.xdr,
+      req.body.public_key || req.query.public_key
     );
     token.validate();
 

@@ -1,14 +1,10 @@
 const express = require('express');
 const expressJwt = require('express-jwt');
 
-// const StellarSdk = require("stellar-sdk");
 const Mobius = require("@mobius-network/mobius-client-js");
 
 const apiApp = express();
 module.exports = apiApp;
-
-apiApp.use(express.json());
-apiApp.use(express.urlencoded({ extended: true }));
 
 apiApp.use((req, res, next) => {
   const { APP_KEY } = req.webtaskContext.secrets;
@@ -38,20 +34,66 @@ apiApp.get("/balance", async (req, res, next) => {
   }
 });
 
-apiApp.get("/charge", async (req, res, next) => {
+apiApp.post("/charge", async (req, res, next) => {
   try {
     const { APP_KEY } = req.webtaskContext.secrets;
     const dapp = await Mobius.AppBuilder.build(APP_KEY, req.user.sub);
 
-    const amount = req.query.amount
+    const { amount, target_address } = req.body;
 
-    if (amount === null || isNaN(amount)) {
-      return res.status(400).json({
-        error: "Invalid amount"
-      })
+    if (amount === null || isNaN(Number(amount))) {
+      return res.status(400).json({ error: "Invalid amount" })
     }
 
-    const response = await dapp.pay(req.query.amount, req.query.target_address)
+    const response = await dapp.charge(amount, target_address);
+    res.json({
+      status: "ok",
+      tx_hash: response.hash,
+      balance: dapp.userBalance
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+apiApp.post("/payout", async (req, res, next) => {
+  try {
+    const { APP_KEY } = req.webtaskContext.secrets;
+    const dapp = await Mobius.AppBuilder.build(APP_KEY, req.user.sub);
+
+    const { amount, target_address } = req.body;
+
+    if (!amount || isNaN(Number(amount))) {
+      return res.status(400).json({ error: "Invalid amount" })
+    }
+
+    const response = await dapp.payout(amount, target_address);
+    res.json({
+      status: "ok",
+      tx_hash: response.hash,
+      balance: dapp.userBalance
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+apiApp.post("/transfer", async (req, res, next) => {
+  try {
+    const { APP_KEY } = req.webtaskContext.secrets;
+    const dapp = await Mobius.AppBuilder.build(APP_KEY, req.user.sub);
+
+    const { amount, target_address } = req.body;
+
+    if (!amount || isNaN(Number(amount))) {
+      return res.status(400).json({ error: "Invalid amount" })
+    }
+
+    if (!target_address) {
+      return res.status(400).json({ error: "Missing target_address parameter" })
+    }
+
+    const response = await dapp.transfer(amount, target_address);
     res.json({
       status: "ok",
       tx_hash: response.hash,
@@ -80,6 +122,5 @@ function logErrors(err, req, res, next) {
 }
 
 function errorHandler(err, req, res, next) {
-  res.status(500);
-  res.json({ error: "Internal server error" });
+  res.status(500).json({ error: "Internal server error" });
 }
