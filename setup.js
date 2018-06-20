@@ -85,6 +85,7 @@ function readConfig() {
 
 async function writeConfig(config) {
   const {APP_KEY, ...cfg} = config;
+  cfg.APP_STORE = cfg.NETWORK === 'public' ? 'store.mobius.network' : 'store.beta.mobius.network'
   return Promise.all([
     writeFile(".env", Object.entries(cfg).map(kv => kv.join('=')).join("\n")),
     writeFile(".secrets", `APP_KEY=${APP_KEY}`),
