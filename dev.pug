@@ -2,47 +2,57 @@ doctype html
 
 html
 head
+  link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css")
   style.
     .field { margin-top: 0.5em; }
     label { width: 500px; display: block; }
     input, textarea { width: 500px; }
 body
-  h1 Authorize application
+  .ui.container
+    h1 Authorize application
 
-  .field
-    label(for='mobiusNetwork') Stellar Network
-    input#mobiusNetwork(type="text", disabled=true, value=mobius.network.networkPassphrase())
-    label(for='appPublicKey') Application Public Key
-    input#appPublicKey(type="text", disabled="disabled", value=appKeypair.publicKey())
+    .ui.form
+      .field
+        label(for='mobiusNetwork') Stellar Network
+        input#mobiusNetwork(type="text", disabled=true, value=mobius.network.networkPassphrase())
+        label(for='appPublicKey') Application Public Key
+        input#appPublicKey(type="text", disabled="disabled", value=appKeypair.publicKey())
 
-  h2 Stage 1: Request Challenge
+    h2.ui.dividing.header Step 1: Request Challenge
 
-  .field
-    textarea#challenge_xdr(disabled="disabled", rows="10")
+    .ui.form
+      .field
+        textarea#challenge_xdr(disabled="disabled", rows="10")
 
-  .field
-    input#challenge(type="button", value="Request challenge")
+      .field
+        button#challenge.ui.button.green Request challenge
 
-  h2 Stage 2: Sign Challenge
+    h2.ui.dividing.header Step 2: Sign Challenge
 
-  form
-    .field
-      label(for="public_key") Public Key:
-      input#public_key(type="text")
-    .field
-      label(for="secret") Private Key:
-      input#secret(type="text")
-    .field
-      input#sign(type="button", value="Sign and send challenge")
+    .ui.form
+      .field
+        label(for="public_key") Public Key:
+        input#public_key(type="text" value=userKeypair.publicKey())
+      .field
+        label(for="secret") Private Key:
+        input#secret(type="text" value=userKeypair.secret())
+      .field
+        button#sign.ui.button.green Sign and send challenge
 
-  h2 Stage 3: Go to app with the token
+    h2.ui.dividing.header Step 3: Play
 
-  .field
-    label(for="token") Token:
-    input#token(type=text)
+    .ui.form
+      .field
+        label(for="token") Token:
+        input#token(type=text)
 
-  .field
-    input#gotoapp(type="button", value="Go to App", disabled=true)
+      .field
+        button#charge.ui.button.green(disabled=true) Charge 10 MOBI
+        span#charge-result.api-call-result
+
+      .field
+        button#balance.ui.button.green(disabled=true) Balance
+        span#balance-result.api-call-result
 
   script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js")
   script(src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js")
@@ -51,12 +61,9 @@ body
     $(function () {
       var xdr = null;
       var signedXDR = null;
-      var random_keypair = StellarSdk.Keypair.random();
       var appPublicKey = $("#appPublicKey").val();
 
       StellarSdk.Network.use(new StellarSdk.Network("#{mobius.network.networkPassphrase()}"));
-      $("#public_key").val(random_keypair.publicKey());
-      $("#secret").val(random_keypair.secret());
 
       function verify(tx, keypair) {
         const { signatures } = tx;
@@ -65,7 +72,6 @@ body
         if (!signatures || signatures.length === 0) {
           return false;
         }
-
 
         return signatures.some(function(signature) { return keypair.verify(hash, signature.signature()) });
       }
@@ -99,13 +105,32 @@ body
           public_key: keypair.publicKey()
         }).then(function(response) {
           $("#token").val(response.data);
-          $("#gotoapp").prop("disabled", false);
+          $("#charge").prop("disabled", false);
+          $("#balance").prop("disabled", false);
         }).catch(function(err) {
           $("#token").val(err.message);
         });
       });
 
-      $("#gotoapp").on("click", function() {
-        window.open(`http://localhost:8080/api/test?token=${$("#token").val()}`, "_blank");
+      $("#balance").on("click", function(e) {
+        $(e.target).addClass('loading');
+        $(".api-call-result").empty();
+        axios.get(`http://localhost:8080/api/balance?token=${$("#token").val()}`)
+        .then(function (response) {
+          $(e.target).removeClass('loading');
+          $("#balance-result").text(`Your current balance is ${response.data.balance}`);
+        });
+      });
+
+      $("#charge").on("click", function(e) {
+        $(e.target).addClass('loading');
+        $(".api-call-result").empty();
+        axios.post(
+          `http://localhost:8080/api/charge?token=${$("#token").val()}`,
+          { amount: 10 }
+        ).then(function(response) {
+          $(e.target).removeClass('loading');
+          $("#charge-result").text(`Ok! Your current balance is ${response.data.balance}`);
+        });
       });
     });

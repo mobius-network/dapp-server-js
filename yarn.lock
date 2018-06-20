@@ -515,7 +515,7 @@
     lodash "^4.17.5"
     to-fast-properties "^2.0.0"
 
-"@mobius-network/mobius-client-js@^0.4.0":
+"@mobius-network/mobius-client-js@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@mobius-network/mobius-client-js/-/mobius-client-js-0.4.1.tgz#66401820ea8140787de25036739e3c3c66158253"
   dependencies:
