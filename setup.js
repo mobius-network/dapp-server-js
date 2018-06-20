@@ -18,6 +18,11 @@ const mobius = new Mobius.Client();
 
 const ui = new inquirer.ui.BottomBar();
 
+const APP_STORE_DOMAINS = {
+  testnet: "store.beta.mobius.network",
+  public: "store.mobius.network",
+};
+
 const appConfig = readConfig();
 const questions = [
   {
@@ -60,6 +65,7 @@ const questions = [
 ];
 
 inquirer.prompt(questions).then(async (answers) => {
+  Object.assign(answers, { APP_STORE: APP_STORE_DOMAINS[answers.NETWORK] });
   await writeConfig(answers);
   let devPageParams = answers;
 
