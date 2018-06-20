@@ -14,9 +14,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Set Stellar network to use, based on webtask meta
 app.use((req, res, next) => {
-  network = req.webtaskContext.meta.NETWORK;
-  mobius.network =
-    network === 'public' ? StellarSdk.Networks.PUBLIC : StellarSdk.Networks.TESTNET;
+  const network = req.webtaskContext.meta.NETWORK;
+  req.pubnet = network === 'public';
+  mobius.network = req.pubnet ? StellarSdk.Networks.PUBLIC : StellarSdk.Networks.TESTNET;
   next();
 });
 
