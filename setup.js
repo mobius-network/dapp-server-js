@@ -61,8 +61,13 @@ const questions = [
 
 inquirer.prompt(questions).then(async (answers) => {
   await writeConfig(answers);
-  const userKeypair = await setupUserAccount(answers.APP_KEY);
-  await writeDevPage(Object.assign({userKeypair: userKeypair}, answers));
+  let devPageParams = answers;
+
+  if (answers.NETWORK === 'testnet') {
+    devPageParams.userKeypair = await setupUserAccount(answers.APP_KEY);
+  }
+
+  await writeDevPage(devPageParams);
   ui.updateBottomBar("All set! Open dev.html file to play with your server!");
 });
 

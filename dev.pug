@@ -32,10 +32,10 @@ body
     .ui.form
       .field
         label(for="public_key") Public Key:
-        input#public_key(type="text" value=userKeypair.publicKey())
+        input#public_key(type="text" value=userKeypair && userKeypair.publicKey())
       .field
         label(for="secret") Private Key:
-        input#secret(type="text" value=userKeypair.secret())
+        input#secret(type="text" value=userKeypair && userKeypair.secret())
       .field
         button#sign.ui.button.green Sign and send challenge
 
