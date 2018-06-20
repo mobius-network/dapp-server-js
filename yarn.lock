@@ -2125,6 +2125,10 @@ expand-range@^1.8.1:
   dependencies:
     fill-range "^2.1.0"
 
+express-cors@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/express-cors/-/express-cors-0.0.3.tgz#5c25a78d7be69a4fcb08412cb27c8dfc758896bd"
+
 express-jwt@^5.3.1:
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/express-jwt/-/express-jwt-5.3.1.tgz#66f05c7dddb5409c037346a98b88965bb10ea4ae"

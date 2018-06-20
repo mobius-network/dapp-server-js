@@ -14,20 +14,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Set Stellar network to use, based on webtask meta
 app.use((req, res, next) => {
-  network = req.webtaskContext.meta.NETWORK;
-  mobius.network =
-    network === 'public' ? StellarSdk.Networks.PUBLIC : StellarSdk.Networks.TESTNET;
-  next();
-});
-
-app.use((req, res, next) => {
-  const { APP_DOMAIN } = req.webtaskContext.meta;
-
-  let allowedDomain =
-    req.webtaskContext.meta.NETWORK === 'public' ? APP_DOMAIN : '*';
-
-  res.header("Access-Control-Allow-Origin", allowedDomain);
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  const network = req.webtaskContext.meta.NETWORK;
+  req.pubnet = network === 'public';
+  mobius.network = req.pubnet ? StellarSdk.Networks.PUBLIC : StellarSdk.Networks.TESTNET;
   next();
 });
 
