@@ -1,10 +1,15 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('./cors');
 
 const Mobius = require("@mobius-network/mobius-client-js");
 
 const authApp = express();
 module.exports = authApp;
+
+authApp.use(cors(
+  req => { return req.webtaskContext.meta.APP_STORE; },
+));
 
 authApp.get("/", (req, res) => {
   const { APP_KEY } = req.webtaskContext.secrets;
