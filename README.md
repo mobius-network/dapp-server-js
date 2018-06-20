@@ -28,6 +28,9 @@ $ yarn setup
 # Run locally
 $ yarn dev
 
+# Open development page
+$ open dev.html
+
 # Deploy to Webtask.io
 $ yarn deploy
 

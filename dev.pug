@@ -10,10 +10,10 @@ body
   h1 Authorize application
 
   .field
-    label(for='appPublicKey') Application Public Key
-    input#appPublicKey(type="text", disabled="disabled", value=publicKey)
     label(for='mobiusNetwork') Stellar Network
     input#mobiusNetwork(type="text", disabled=true, value=mobius.network.networkPassphrase())
+    label(for='appPublicKey') Application Public Key
+    input#appPublicKey(type="text", disabled="disabled", value=appKeypair.publicKey())
 
   h2 Stage 1: Request Challenge
 
@@ -54,7 +54,7 @@ body
       var random_keypair = StellarSdk.Keypair.random();
       var appPublicKey = $("#appPublicKey").val();
 
-      StellarSdk.Network.useTestNetwork();
+      StellarSdk.Network.use(new StellarSdk.Network("#{mobius.network.networkPassphrase()}"));
       $("#public_key").val(random_keypair.publicKey());
       $("#secret").val(random_keypair.secret());
 
@@ -72,7 +72,7 @@ body
 
 
       $("#challenge").on("click", function() {
-        axios.get("./auth").then(function(response) {
+        axios.get("http://localhost:8080/auth").then(function(response) {
           xdr = response.data;
           $("#challenge_xdr").val(xdr);
         }).catch(function(err) {
@@ -94,13 +94,9 @@ body
 
         $("#signed_challenge_xdr").val(signedXDR);
 
-        axios({
-          url: "./auth",
-          method: "post",
-          params: {
-            xdr: signedXDR,
-            public_key: keypair.publicKey()
-          }
+        axios.post("http://localhost:8080/auth", {
+          xdr: signedXDR,
+          public_key: keypair.publicKey()
         }).then(function(response) {
           $("#token").val(response.data);
           $("#gotoapp").prop("disabled", false);
@@ -110,6 +106,6 @@ body
       });
 
       $("#gotoapp").on("click", function() {
-        window.open(`./api/test?token=${$("#token").val()}`, "_blank");
+        window.open(`http://localhost:8080/api/test?token=${$("#token").val()}`, "_blank");
       });
     });
