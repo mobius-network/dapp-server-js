@@ -1,17 +1,21 @@
 const fs = require( 'fs');
 const path = require( 'path');
 const { promisify } = require('util');
+const pug = require("pug");
+const Mobius = require("@mobius-network/mobius-client-js");
+const StellarSdk = require("stellar-sdk");
 
 const axios = require( 'axios');
 const dotenv = require( 'dotenv');
 const inquirer = require( 'inquirer');
-const pug = require( "pug");
 
-const Mobius = require( '@mobius-network/mobius-client-js');
-const StellarSdk = require( 'stellar-sdk');
+const appKeypair = StellarSdk.Keypair.random();
+
+const appDomain = "flappy.mobius.network";
 
 const writeFile = promisify(fs.writeFile);
 const mobius = new Mobius.Client();
+
 const ui = new inquirer.ui.BottomBar();
 
 const APP_STORE_DOMAINS = {
@@ -60,11 +64,17 @@ const questions = [
   },
 ];
 
-
-inquirer.prompt(questions).then(async answers => {
+inquirer.prompt(questions).then(async (answers) => {
   Object.assign(answers, { APP_STORE: APP_STORE_DOMAINS[answers.NETWORK] });
   await writeConfig(answers);
-  await writeDevPage(answers);
+  let devPageParams = answers;
+
+  if (answers.NETWORK === 'testnet') {
+    devPageParams.userKeypair = await setupUserAccount(answers.APP_KEY);
+  }
+
+  await writeDevPage(devPageParams);
+  ui.updateBottomBar("All set! Open dev.html file to play with your server!");
 });
 
 
@@ -97,11 +107,31 @@ async function writeConfig(config) {
   ])
 }
 
+async function fundMobi(addr, amount) {
+  return axios.post(
+    'https://mobius.network/api/stellar/friendbot',
+    { addr: addr, amount: amount }
+  );
+}
+
+async function setupUserAccount(appSecret) {
+  ui.updateBottomBar("Generating users's account...");
+
+  const appKeypair = StellarSdk.Keypair.fromSecret(appSecret);
+  const userKeypair = StellarSdk.Keypair.random();
+
+  return fundMobi(userKeypair.secret(), 1000)
+    .then(() => {
+      Mobius.Blockchain.AddCosigner.call(userKeypair, appKeypair)
+    })
+    .then(() => { return userKeypair });
+}
+
 async function writeDevPage(config) {
   const dev = pug.compileFile("dev.pug", {});
-
   writeFile("dev.html", dev({
     appKeypair: StellarSdk.Keypair.fromSecret(config.APP_KEY),
+    userKeypair: config.userKeypair,
     mobius
   }));
 }
@@ -144,10 +174,7 @@ async function ensureAccount(seed, { NETWORK }) {
     }
     ui.updateBottomBar('Funding account with 1000 MOBI...');
 
-    await axios.post('https://mobius.network/api/stellar/friendbot', {
-      addr: keypair.publicKey(),
-      amount: 1000
-    });
+    await fundMobi(keypair.publicKey(), 1000);
   }
 
   ui.updateBottomBar('');
