@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('express-cors');
+const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
 const Mobius = require("@mobius-network/mobius-client-js");

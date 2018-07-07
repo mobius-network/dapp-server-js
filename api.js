@@ -1,6 +1,6 @@
 const express = require('express');
 const expressJwt = require('express-jwt');
-const cors = require('express-cors');
+const cors = require('cors');
 
 const Mobius = require("@mobius-network/mobius-client-js");
 
