@@ -2,4 +2,4 @@
 /.secrets
 /dev.html
 /node_modules
-
+yarn-error.log

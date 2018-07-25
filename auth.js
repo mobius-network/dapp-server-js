@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const StellarSDK = require('stellar-sdk');
 
 const Mobius = require("@mobius-network/mobius-client-js");
 
@@ -14,6 +16,7 @@ const corsOptions = (req, callback) => {
 };
 
 authApp.use(cors(corsOptions));
+authApp.use(cookieParser());
 
 authApp.get("/", (req, res) => {
   const { APP_KEY } = req.webtaskContext.secrets;
@@ -40,10 +43,13 @@ authApp.post("/", (req, res) => {
       exp: parseInt(token.timeBounds.maxTime, 10),
     };
 
-    res.send(jwt.sign(payload, APP_KEY));
+    const signedPayload = jwt.sign(payload, APP_KEY);
+    const appPublicKey = StellarSDK.Keypair.fromSecret(APP_KEY).publicKey();
+
+    // You might use cookie to authorise
+    res.cookie("MOBIUS_DAPP_" + appPublicKey, signedPayload);
+    res.send(signedPayload);
   } catch (error) {
     res.status(401).json({ error: error.message });
   }
 });
-
-
